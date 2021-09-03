@@ -10,29 +10,33 @@ export class DescriptionEntity {
   id!: number;
 
   @Column({ name: 'effectiveTime', type: 'varchar', length: 10, nullable: true })
-  effectiveTime: string | undefined;
+  effectiveTime: string | null;
 
   @Column({ name: 'active', type: 'bit', nullable: true })
-  active: boolean | undefined;
+  active: boolean | null;
 
   @Column({ name: 'moduleId', type: 'varchar', length: 50, nullable: true })
   @Index({ unique: false })
-  moduleId: string | undefined;
+  moduleId: string | null;
 
   @Column({ name: 'conceptId', type: 'bigint', nullable: true })
-  conceptId: number | undefined;
+  conceptId: number | null;
+
+  // @ManyToOne(() => StatedRelationshipEntity, statedRelation => statedRelation._descriptionRelationSource)
+  // @JoinColumn({ name: 'conceptId' })
+  // _statedRelationshipRelation: StatedRelationshipEntity;
 
   @Column({ name: 'languageCode', type: 'varchar', length: 10, nullable: true })
-  languageCode: string | undefined;
+  languageCode: string | null;
 
   @Column({ name: 'typeId', type: 'bigint', nullable: true })
   @Index({ unique: false })
-  typeId: number | undefined;
+  typeId: number | null;
 
   @Column({ name: 'term', type: 'nvarchar', length: 1000, nullable: true })
   @Index({ unique: false })
-  term: string | undefined;
+  term: string | null;
 
   @Column({ name: 'caseSignificanceId', type: 'bigint', nullable: true })
-  caseSignificanceId: string | undefined;
+  caseSignificanceId: string | null;
 }

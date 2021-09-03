@@ -1,21 +1,79 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { from, map } from 'rxjs';
+import { from, map, switchMap, tap } from 'rxjs';
 import { escape as sqlEscape } from 'sqlstring';
+import { DescriptionEntity, StatedRelationshipEntity } from 'src/entity';
+import { TypeId } from 'src/enum/type-id';
 import { QueryResponse } from 'src/type/query-term';
-import { QueryRunner } from 'typeorm';
+import { FindConditions, In, QueryRunner } from 'typeorm';
 
 @Injectable()
 export class DiagnosisSuggestionService {
+  public getRelationshipByConceptId(
+    queryRunner: QueryRunner,
+    options: {
+      conceptId: string;
+      findFrom: 'sourceId' | 'destinationId';
+      typeCode: keyof typeof TypeId;
+      tail: TermTailParentheses;
+    }
+  ) {
+    const { conceptId, findFrom, typeCode, tail } = options;
+    if (!conceptId) throw new BadRequestException('Invalid request query');
+
+    return from(
+      this.getStatedRelationshipByConceptId(queryRunner, {
+        conceptId,
+        findFrom,
+        typeCode: typeCode as keyof typeof TypeId,
+      })
+    ).pipe(
+      map(result =>
+        result.map(e => (e.sourceId ? e.sourceId : e.destinationId ? e.destinationId : undefined)).filter(e => e)
+      ),
+      switchMap(async result => await this.getTermByConceptId(queryRunner, result)),
+      map(result => result.map(e => ({ ...e, term: this.removeTailInParentheses(e.term, tail) }))),
+      map(result => this.removeDuplicateDescription<DescriptionEntity>(result))
+    );
+  }
+
+  public getTermByConceptId(queryRunner: QueryRunner, conceptIdList: string[]) {
+    return queryRunner.manager.getRepository(DescriptionEntity).find({
+      select: ['pid', 'conceptId', 'term'],
+      where: { active: true, conceptId: In(conceptIdList) },
+    });
+  }
+
+  public async getStatedRelationshipByConceptId(
+    queryRunner: QueryRunner,
+    options: { conceptId: string; findFrom: 'sourceId' | 'destinationId'; typeCode: keyof typeof TypeId }
+  ) {
+    const { conceptId, findFrom, typeCode } = options;
+    let findCondition: FindConditions<StatedRelationshipEntity> = {};
+    if (findFrom === 'sourceId') findCondition = { sourceId: conceptId };
+    else if (findFrom === 'destinationId') findCondition = { destinationId: conceptId };
+
+    const query = await queryRunner.manager.getRepository(StatedRelationshipEntity).find({
+      select: [findFrom === 'destinationId' ? 'sourceId' : 'destinationId'], // destinationId target is default
+      where: { ...findCondition, active: true, typeId: TypeId[typeCode] },
+    });
+    return query;
+  }
+
+  /**
+   * Get search suggestion
+   */
   public getSuggestionDescription(queryRunner: QueryRunner, queryStr: string) {
-    const splitParam = queryStr.split(' ');
-    const reg = /^[a-zA-Z0-9\/\-]+$/i;
+    const tail: TermTailParentheses = 'disorder';
+    const splitParam = queryStr.replace(/\s{2,}/, ' ').split(' ');
+    const reg = /^[a-zA-Z0-9\/\-\.]+$/i;
     const checkChar = splitParam.every(e => reg.test(e));
 
     if (!checkChar) throw new BadRequestException('Invalid input, accept [a-zA-Z0-9/-]');
 
     return from(this.getConceptIdByTerm(queryRunner, splitParam)).pipe(
-      map(data => this.transformQueryResult(data)),
-      map(data => this.removeDuplicateIdValue(data))
+      map(data => this.transformQueryResult<QueryResponse>(data, tail)),
+      map(data => this.sortRankLength<QueryResponse>(data)),
+      map(data => this.removeDuplicateDescription<QueryResponse>(data))
     );
   }
 
@@ -45,20 +103,25 @@ export class DiagnosisSuggestionService {
     return query;
   }
 
-  private transformQueryResult(data: QueryResponse[]): QueryResponse[] {
-    return data
-      .map(e => ({ ...e, term: this.removeTailDisorder(e.term).trim() }))
-      .sort((a, b) => (a.rank === b.rank ? a.term.length - b.term.length : b.rank - a.rank));
+  private transformQueryResult<T extends { [key: string]: any }>(data: T[], tail: TermTailParentheses): T[] {
+    return data.map(e => ({ ...e, term: this.removeTailInParentheses(e.term, tail).trim() }));
   }
 
-  private removeTailDisorder(term: string): string {
-    return term.replace(/\s*\(disorder\)\s*$/i, '');
+  private sortRankLength<T extends { [key: string]: any }>(data: T[]): T[] {
+    return data.sort((a, b) => (a.rank === b.rank ? a.term.length - b.term.length : b.rank - a.rank));
   }
 
-  private removeDuplicateIdValue(data: QueryResponse[]): QueryResponse[] {
+  private removeTailInParentheses(term: string, type: TermTailParentheses): string {
+    const reg = new RegExp(`\\s*\\(${type}\\)\\s*$`, 'i');
+    return term.replace(reg, '');
+  }
+
+  private removeDuplicateDescription<T extends { [key: string]: any }>(data: T[]): T[] {
     return data.filter(
       (thing, index, self) => index === self.findIndex(t => t.conceptId === thing.conceptId && t.term === thing.term)
     );
     // Code from stack overflow: 2218999
   }
 }
+
+type TermTailParentheses = 'disorder' | 'body structure';

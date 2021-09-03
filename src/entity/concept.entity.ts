@@ -10,16 +10,16 @@ export class ConceptEntity {
   id!: number;
 
   @Column({ name: 'effectiveTime', type: 'varchar', length: 10, nullable: true })
-  effectiveTime: string | undefined;
+  effectiveTime: string | null;
 
   @Column({ name: 'active', type: 'bit', nullable: true })
-  active: boolean | undefined;
+  active: boolean | null;
 
   @Column({ name: 'moduleId', type: 'varchar', length: 50, nullable: true })
   @Index({ unique: false })
-  moduleId: string | undefined;
+  moduleId: string | null;
 
   @Column({ name: 'definitionStatusId', type: 'varchar', length: 50, nullable: true })
   @Index({ unique: false })
-  definitionStatusId: string | undefined;
+  definitionStatusId: string | null;
 }
