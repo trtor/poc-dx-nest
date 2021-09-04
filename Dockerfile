@@ -31,7 +31,7 @@ RUN chown node:node .
 USER node
 COPY package*.json ./
 COPY yarn.lock ./
-RUN yarn install --production --proxy ${PROXY}
+RUN yarn install --production
 
 COPY --from=builder /usr/src/app/ /usr/src/app/
 
