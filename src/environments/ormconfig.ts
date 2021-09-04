@@ -1,8 +1,9 @@
+import { join } from 'path';
 import { ConnectionOptions } from 'typeorm';
 
-export const ormConfig: ConnectionOptions = {
+export default {
   type: 'mssql',
-  host: process.env.MSSQL_HOST,
+  host: process.env.MSSQL_HOST || 'localhost',
   port: Number.parseInt(process.env.MSSQL_PORT || '1433'),
   username: process.env.MSSQL_USERNAME,
   password: process.env.MSSQL_PASSWORD,
@@ -10,15 +11,15 @@ export const ormConfig: ConnectionOptions = {
   schema: process.env.MSSQL_DATABASE_SCHEMA,
   synchronize: process.env.TYPEORM_SYNC === 'true',
   logging: false,
-  entities: ['src/entity/**/*.ts'],
-  migrations: ['src/migrations/**/*.ts'],
-  // subscribers: ['src/subscriber/**/*.ts'],
+  entities: [join(__dirname, 'src/entity', '**', '*.entity.{ts,js}')],
+  migrations: [join(__dirname, 'src/migrations', '**', '*.{ts,js}')],
   cli: {
     entitiesDir: 'src/entity',
     migrationsDir: 'src/migrations',
-    // subscribersDir: 'src/subscriber',
   },
   extra: {
-    trustServerCertificate: process.env.TYPEORM_SYNC === 'true',
+    trustServerCertificate: process.env.TYPEORM_TRUSTSERVERCERT === 'true',
   },
-};
+} as ConnectionOptions;
+
+// console.info('dirname', __dirname);
