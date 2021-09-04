@@ -22,7 +22,7 @@ RUN yarn migration:run
 # Second Stage
 FROM node:16-alpine
 ENV NODE_ENV=production
-
+ARG PROXY
 RUN yarn config set proxy ${PROXY} && \
   yarn config set https-proxy ${PROXY}
 
