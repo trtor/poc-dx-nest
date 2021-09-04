@@ -38,7 +38,7 @@ COPY package*.json ./
 COPY yarn.lock ./
 RUN yarn install --production
 
-COPY --from=builder /usr/src/app/ /usr/src/app/
+COPY --from=builder /usr/src/app/dist /usr/src/app/dist
 
 ENV HTTP_PROXY=null  \
   HTTPS_PROXY=null \
