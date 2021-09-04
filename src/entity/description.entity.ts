@@ -19,17 +19,14 @@ export class DescriptionEntity {
   @Index({ unique: false })
   moduleId: string | null;
 
-  @Column({ name: 'conceptId', type: 'bigint', nullable: true })
-  conceptId: number | null;
-
-  // @ManyToOne(() => StatedRelationshipEntity, statedRelation => statedRelation._descriptionRelationSource)
-  // @JoinColumn({ name: 'conceptId' })
-  // _statedRelationshipRelation: StatedRelationshipEntity;
+  @Column({ name: 'conceptId', type: 'varchar', length: 50, nullable: true })
+  @Index({ unique: false })
+  conceptId: string | null;
 
   @Column({ name: 'languageCode', type: 'varchar', length: 10, nullable: true })
   languageCode: string | null;
 
-  @Column({ name: 'typeId', type: 'bigint', nullable: true })
+  @Column({ name: 'typeId', type: 'varchar', length: 50, nullable: true })
   @Index({ unique: false })
   typeId: number | null;
 
@@ -37,6 +34,6 @@ export class DescriptionEntity {
   @Index({ unique: false })
   term: string | null;
 
-  @Column({ name: 'caseSignificanceId', type: 'bigint', nullable: true })
+  @Column({ name: 'caseSignificanceId', type: 'varchar', length: 50, nullable: true })
   caseSignificanceId: string | null;
 }
