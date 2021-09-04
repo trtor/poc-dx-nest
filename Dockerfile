@@ -38,7 +38,7 @@ COPY package*.json ./
 COPY yarn.lock ./
 RUN yarn install --production
 
-COPY --from=builder /usr/src/app/dist /usr/src/app/dist
+COPY --from=builder /usr/src/app/dist ./dist
 
 ENV HTTP_PROXY=null  \
   HTTPS_PROXY=null \
@@ -47,4 +47,4 @@ ENV HTTP_PROXY=null  \
 
 EXPOSE 5000
 
-ENTRYPOINT [ "node", "dist/index.js" ]
+CMD [ "yarn", "start:prod" ]
