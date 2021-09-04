@@ -22,12 +22,16 @@ RUN yarn migration:run
 # Second Stage
 FROM node:16-alpine
 ENV NODE_ENV=production
+
+RUN yarn config set proxy ${PROXY} && \
+  yarn config set https-proxy ${PROXY}
+
 WORKDIR /usr/src/app
 RUN chown node:node .
 USER node
 COPY package*.json ./
 COPY yarn.lock ./
-RUN yarn install --production
+RUN yarn install --production --proxy ${PROXY}
 
 COPY --from=builder /usr/src/app/ /usr/src/app/
 
