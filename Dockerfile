@@ -23,6 +23,11 @@ RUN yarn migration:run
 FROM node:16-alpine
 ENV NODE_ENV=production
 ARG PROXY
+ENV HTTP_PROXY=$PROXY \
+  HTTPS_PROXY=$PROXY \
+  http_proxy=$PROXY \
+  https_proxy=$PROXY
+
 RUN yarn config set proxy ${PROXY} && \
   yarn config set https-proxy ${PROXY}
 
@@ -34,6 +39,11 @@ COPY yarn.lock ./
 RUN yarn install --production
 
 COPY --from=builder /usr/src/app/ /usr/src/app/
+
+ENV HTTP_PROXY=null  \
+  HTTPS_PROXY=null \
+  http_proxy=null \
+  https_proxy=null
 
 EXPOSE 5000
 
