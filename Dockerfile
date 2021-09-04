@@ -1,12 +1,11 @@
 # First Stage
-FROM node:16 AS builder
+FROM node:14 AS builder
 
 ARG PROXY
 ENV HTTP_PROXY=$PROXY \
   HTTPS_PROXY=$PROXY \
   http_proxy=$PROXY \
   https_proxy=$PROXY
-
 RUN yarn config set proxy ${PROXY} && \
   yarn config set https-proxy ${PROXY}
 
@@ -20,14 +19,13 @@ RUN yarn build
 RUN yarn migration:run
 
 # Second Stage
-FROM node:16-alpine
+FROM node:14-alpine
 ENV NODE_ENV=production
 ARG PROXY
 ENV HTTP_PROXY=$PROXY \
   HTTPS_PROXY=$PROXY \
   http_proxy=$PROXY \
   https_proxy=$PROXY
-
 RUN yarn config set proxy ${PROXY} && \
   yarn config set https-proxy ${PROXY}
 

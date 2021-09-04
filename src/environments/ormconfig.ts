@@ -14,8 +14,8 @@ export default {
   entities: [join(__dirname, 'src/entity', '**', '*.entity.{ts,js}')],
   migrations: [join(__dirname, 'src/migrations', '**', '*.{ts,js}')],
   cli: {
-    entitiesDir: 'src/entity',
-    migrationsDir: 'src/migrations',
+    entitiesDir: join(__dirname, 'src/entity'),
+    migrationsDir: join(__dirname, 'src/migrations'),
   },
   extra: {
     trustServerCertificate: process.env.TYPEORM_TRUSTSERVERCERT === 'true',

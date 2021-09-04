@@ -12,7 +12,7 @@ import { UnsubscribeInterceptor } from './interceptor/unsubscribe.interceptor';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({ envFilePath: '.env' }),
     TypeOrmModule.forRoot({ ...ormConfig, autoLoadEntities: true }),
     TypeOrmModule.forFeature([ConceptEntity, DescriptionEntity, RelationshipEntity, StatedRelationshipEntity]),
     DiagnosisSuggestionModule,
