@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { from, map, switchMap, tap } from 'rxjs';
+import { from, map, switchMap } from 'rxjs';
 import { escape as sqlEscape } from 'sqlstring';
 import { DescriptionEntity, StatedRelationshipEntity } from 'src/entity';
 import { TypeId } from 'src/enum/type-id';
@@ -96,7 +96,6 @@ export class DiagnosisSuggestionService {
         d.active = 1
         AND term NOT like '[[]X]%'
     `);
-    console.log(query.length);
     return query;
   }
 
