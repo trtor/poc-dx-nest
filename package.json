@@ -20,6 +20,7 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "migration:run": "yarn env-cmd -f .env ts-node -P ./tsconfig.json -r tsconfig-paths/register ./node_modules/typeorm/cli.js --config ./src/environments/ormconfig.ts migration:run",
+    "migration:revert": "yarn env-cmd -f .env ts-node -P ./tsconfig.json -r tsconfig-paths/register ./node_modules/typeorm/cli.js --config ./src/environments/ormconfig.ts migration:revert",
     "migration:generate": "yarn env-cmd -f .env ts-node -P ./tsconfig.json -r tsconfig-paths/register ./node_modules/typeorm/cli.js --config ./src/environments/ormconfig.ts migration:generate -n",
     "migration:create": "yarn env-cmd -f .env ts-node -P ./tsconfig.json -r tsconfig-paths/register ./node_modules/typeorm/cli.js --config ./src/environments/ormconfig.ts migration:create -n"
   },
