@@ -70,14 +70,37 @@ export class DiagnosisSuggestionService {
 
     if (!checkChar) throw new BadRequestException('Invalid input, accept [a-zA-Z0-9/-]');
 
-    return from(this.getConceptIdByTerm(queryRunner, splitParam)).pipe(
+    return from(this.getDisorderConceptIdByTerm(queryRunner, splitParam)).pipe(
       map(data => this.transformQueryResult<QueryResponse>(data, tail)),
       map(data => this.sortRankLength<QueryResponse>(data)),
       map(data => this.removeDuplicateDescription<QueryResponse>(data))
     );
   }
 
-  public async getConceptIdByTerm(queryRunner: QueryRunner, termId: string[]): Promise<QueryResponse[]> {
+  private async getDisorderConceptIdByTerm(queryRunner: QueryRunner, termId: string[]): Promise<QueryResponse[]> {
+    termId = termId.map(e => sqlEscape(e)).map(e => e.substring(1, e.length - 1));
+    const termList = termId.join(`*" AND "`);
+
+    const query: QueryResponse[] = await queryRunner.query(`
+      SELECT
+        Rank as rank,
+        d.conceptId,
+        d.term,
+        d.pid
+      FROM
+        description_disorder AS d
+        INNER JOIN CONTAINSTABLE
+          ( description_disorder, term, '"${termList}*"')
+          AS KEY_TBL ON d.pid = KEY_TBL.[KEY]
+      WHERE
+        d.active = 1
+        AND term NOT like '[[]X]%'
+    `);
+    console.log(query.length);
+    return query;
+  }
+
+  private async getDescriptionConceptIdByTerm(queryRunner: QueryRunner, termId: string[]): Promise<QueryResponse[]> {
     termId = termId.map(e => sqlEscape(e)).map(e => e.substring(1, e.length - 1));
     const termList = termId.join(`*" AND "`);
 

@@ -19,6 +19,7 @@ SELECT
 
 ```sql
 CREATE FULLTEXT CATALOG DescriptionFT
+CREATE FULLTEXT CATALOG DescriptionFTDisorder
 ```
 
 ## Create FullText Index
@@ -29,7 +30,12 @@ Copy `PK_xxxxxxxxxxxxxxx` from migration file
 CREATE FULLTEXT INDEX ON dbo.description(term)
 KEY INDEX PK_afee2ebe290199c052a015e1fc5 -- PK_xxxxx from migration file
 ON DescriptionFT
-WITH CHANGE_TRACKING AUTO
+WITH CHANGE_TRACKING AUTO;
+
+CREATE FULLTEXT INDEX ON dbo.description_disorder(term)
+KEY INDEX PK_3ec57abf463fc7ebf6df65108f4 -- PK_xxxxx from migration file
+ON DescriptionFTDisorder
+WITH CHANGE_TRACKING AUTO;
 ```
 
 ## Search example

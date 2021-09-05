@@ -6,7 +6,13 @@ import 'reflect-metadata';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DiagnosisSuggestionModule } from './app/diagnosis-suggestion/diagnosis-suggestion.module';
-import { ConceptEntity, DescriptionEntity, RelationshipEntity, StatedRelationshipEntity } from './entity';
+import {
+  ConceptEntity,
+  DescriptionDisorderEntity,
+  DescriptionEntity,
+  RelationshipEntity,
+  StatedRelationshipEntity,
+} from './entity';
 import ormConfig from './environments/ormconfig';
 import { UnsubscribeInterceptor } from './interceptor/unsubscribe.interceptor';
 
@@ -14,7 +20,13 @@ import { UnsubscribeInterceptor } from './interceptor/unsubscribe.interceptor';
   imports: [
     ConfigModule.forRoot({ envFilePath: '.env' }),
     TypeOrmModule.forRoot({ ...ormConfig, autoLoadEntities: true }),
-    TypeOrmModule.forFeature([ConceptEntity, DescriptionEntity, RelationshipEntity, StatedRelationshipEntity]),
+    TypeOrmModule.forFeature([
+      ConceptEntity,
+      DescriptionDisorderEntity,
+      DescriptionEntity,
+      RelationshipEntity,
+      StatedRelationshipEntity,
+    ]),
     DiagnosisSuggestionModule,
   ],
   controllers: [AppController],
