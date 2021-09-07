@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { from, map, switchMap } from 'rxjs';
 import { escape as sqlEscape } from 'sqlstring';
-import { DescriptionEntity, StatedRelationshipEntity } from 'src/entity';
+import { DescriptionEntity, RelationshipEntity } from 'src/entity';
 import { TypeId } from 'src/enum/type-id';
 import { QueryResponse } from 'src/type/query-term';
 import { FindConditions, In, QueryRunner } from 'typeorm';
@@ -48,11 +48,11 @@ export class DiagnosisSuggestionService {
     options: { conceptId: string; findFrom: 'sourceId' | 'destinationId'; typeCode: keyof typeof TypeId }
   ) {
     const { conceptId, findFrom, typeCode } = options;
-    let findCondition: FindConditions<StatedRelationshipEntity> = {};
+    let findCondition: FindConditions<RelationshipEntity> = {};
     if (findFrom === 'sourceId') findCondition = { sourceId: conceptId };
     else if (findFrom === 'destinationId') findCondition = { destinationId: conceptId };
 
-    const query = await queryRunner.manager.getRepository(StatedRelationshipEntity).find({
+    const query = await queryRunner.manager.getRepository(RelationshipEntity).find({
       select: [findFrom === 'destinationId' ? 'sourceId' : 'destinationId'], // destinationId target is default
       where: { ...findCondition, active: true, typeId: TypeId[typeCode] },
     });
@@ -92,9 +92,6 @@ export class DiagnosisSuggestionService {
         INNER JOIN CONTAINSTABLE
           ( description_disorder, term, '"${termList}*"')
           AS KEY_TBL ON d.pid = KEY_TBL.[KEY]
-      WHERE
-        d.active = 1
-        AND term NOT like '[[]X]%'
     `);
     return query;
   }

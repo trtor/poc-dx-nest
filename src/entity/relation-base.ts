@@ -19,11 +19,11 @@ export class RelationBase {
   moduleId: string | null;
 
   @Column({ name: 'sourceId', type: 'varchar', length: 50, nullable: true })
-  @Index({ unique: false })
+  @Index(['sourceId', 'typeId', 'destinationId'], { unique: false })
   sourceId: string | null;
 
   @Column({ name: 'destinationId', type: 'varchar', length: 50, nullable: true })
-  @Index({ unique: false })
+  @Index(['destinationId', 'typeId', 'sourceId'], { unique: false })
   destinationId: string | null;
 
   @Column({ name: 'relationshipGroup', type: 'varchar', length: 50, nullable: true })
