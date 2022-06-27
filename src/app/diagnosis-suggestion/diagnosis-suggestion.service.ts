@@ -4,7 +4,7 @@ import { escape as sqlEscape } from 'sqlstring';
 import { DescriptionEntity, RelationshipEntity } from 'src/entity';
 import { TypeId } from 'src/enum/type-id';
 import { QueryResponse } from 'src/type/query-term';
-import { FindConditions, In, QueryRunner } from 'typeorm';
+import { FindOptionsWhere, In, QueryRunner } from 'typeorm';
 
 @Injectable()
 export class DiagnosisSuggestionService {
@@ -48,7 +48,7 @@ export class DiagnosisSuggestionService {
     options: { conceptId: string; findFrom: 'sourceId' | 'destinationId'; typeCode: keyof typeof TypeId }
   ) {
     const { conceptId, findFrom, typeCode } = options;
-    let findCondition: FindConditions<RelationshipEntity> = {};
+    let findCondition: FindOptionsWhere<RelationshipEntity> = {};
     if (findFrom === 'sourceId') findCondition = { sourceId: conceptId };
     else if (findFrom === 'destinationId') findCondition = { destinationId: conceptId };
 
